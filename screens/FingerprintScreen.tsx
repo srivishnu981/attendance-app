@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import ScreenBackground from './components/ScreenBackground';
+import { API_URL } from './config';
 
 export default function FingerprintScreen({ route, navigation }: any) {
-  const { studentId } = route.params;
+    const { studentId, qrData } = route.params;
   const [statusText, setStatusText] = useState('Tap below to verify your identity');
 
   const handleVerify = async () => {
@@ -26,12 +27,31 @@ export default function FingerprintScreen({ route, navigation }: any) {
       disableDeviceFallback: true,
     });
 
-    if (result.success) {
-      navigation.navigate('Success', { studentId });
-    } else {
-      setStatusText('Verification failed or cancelled. Please try again.');
-    }
-  };
+          if (result.success) {
+        try {
+          const { sessionId, token } = JSON.parse(qrData);
+          const res = await fetch(`${API_URL}/attendance/mark`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, studentId, token }),
+          });
+          const data = await res.json();
+
+          if (res.status === 409) {
+            setStatusText('QR code expired — please scan again.');
+            return;
+          }
+          if (!res.ok) {
+            setStatusText(data.error || 'Could not mark attendance. Try again.');
+            return;
+          }
+          navigation.navigate('Success', { studentId });
+        } catch (err) {
+          setStatusText('Could not reach server. Check your connection.');
+        }
+      } else {
+        setStatusText('Verification failed or cancelled. Please try again.');
+      }};
 
   return (
     <ScreenBackground>

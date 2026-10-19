@@ -29,6 +29,14 @@ export const TEACHERS: TeacherInfo[] = [
       { id: 'c3', subject: 'CS210 - Discrete Math', roomId: 'Room-301' },
     ],
   },
+  {
+    code: 'T103',
+    name: 'Dr. Sunil P V',
+    classes: [
+      { id: 'c4', subject: 'SDTT (Software Design Tools and Techniques)', roomId: 'C003' },
+      { id: 'c5', subject: 'SDTT (Software Design Tools and Techniques)', roomId: 'C002' },
+    ],
+  },
 ];
 
 export function findTeacherByCode(code: string): TeacherInfo | undefined {

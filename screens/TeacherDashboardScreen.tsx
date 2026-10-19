@@ -15,7 +15,7 @@ export default function TeacherDashboardScreen({ route, navigation }: any) {
       const res = await fetch(`${API_URL}/session/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, roomId }),
+        body: JSON.stringify({ teacherId: teacherName, classId: `${subject}-${roomId}` }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -25,14 +25,16 @@ export default function TeacherDashboardScreen({ route, navigation }: any) {
       }
       navigation.navigate('ActiveSession', {
         sessionId: data.sessionId,
-        subject: data.subject,
-        roomId: data.roomId,
+        qrDataUrl: data.qrDataUrl,
+        subject,
+        roomId,
       });
     } catch (err) {
       setError('Could not reach server. Check your connection and API_URL.');
     }
     setLoading(false);
   };
+    
 
   return (
     <ScreenBackground>
